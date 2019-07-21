@@ -20,7 +20,7 @@ export async function executeFunction(context: IActionContext, node?: FunctionTr
     const name: string = node.name;
     const client: SiteClient = node.root.client;
     await node.runWithTemporaryDescription(localize('executing', 'Executing...'), async () => {
-        const adminKey: string = await client.getFunctionsAdminToken();
+        const adminKey: string = (await client.getFunctionsAdminToken()).body;
         // https://docs.microsoft.com/azure/azure-functions/functions-manually-run-non-http
         await <Thenable<string>>request({
             method: 'POST',

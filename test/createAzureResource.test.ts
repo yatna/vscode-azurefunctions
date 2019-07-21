@@ -3,15 +3,15 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+import { WebSiteManagementClient, WebSiteManagementModels } from '@azure/arm-appservice';
 import * as assert from 'assert';
 import { ResourceManagementClient } from 'azure-arm-resource';
-import { WebSiteManagementClient, WebSiteManagementModels } from 'azure-arm-website';
 import * as fse from 'fs-extra';
 import { IHookCallbackContext, ISuiteCallbackContext } from 'mocha';
 import * as path from 'path';
 import * as request from 'request-promise';
 import * as vscode from 'vscode';
-import { AzExtTreeDataProvider, AzureAccountTreeItemWithProjects, delay, DialogResponses, ext, getRandomHexString, ProjectLanguage, TestAzureAccount, TestUserInput } from '../extension.bundle';
+import { AzExtTreeDataProvider, AzureAccountTreeItemWithProjects, createAzureClientV2, delay, DialogResponses, ext, getRandomHexString, ProjectLanguage, TestAzureAccount, TestUserInput } from '../extension.bundle';
 import { longRunningTestsEnabled } from './global.test';
 import { runWithFuncSetting } from './runWithSetting';
 import { getCSharpValidateOptions, getJavaScriptValidateOptions, IValidateProjectOptions, validateProject } from './validateProject';
@@ -179,7 +179,16 @@ suite('Create Azure Resources', async function (this: ISuiteCallbackContext): Pr
 });
 
 function getWebsiteManagementClient(testAccount: TestAzureAccount): WebSiteManagementClient {
-    return new WebSiteManagementClient(testAccount.getSubscriptionCredentials(), testAccount.getSubscriptionId());
+    return createAzureClientV2(
+        {
+            credentials: testAccount.getSubscriptionCredentials(),
+            subscriptionId: testAccount.getSubscriptionId(),
+            environment: {
+                resourceManagerEndpointUrl: 'https://management.azure.com/'
+            }
+        },
+        WebSiteManagementClient
+    );
 }
 
 function getResourceManagementClient(testAccount: TestAzureAccount): ResourceManagementClient {

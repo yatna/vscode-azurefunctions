@@ -3,10 +3,10 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { WebSiteManagementClient, WebSiteManagementModels } from 'azure-arm-website';
+import { WebSiteManagementClient, WebSiteManagementModels } from '@azure/arm-appservice';
 import { MessageItem } from 'vscode';
 import { AppKind, IAppServiceWizardContext, IAppSettingsContext, SiteClient, SiteCreateStep, SiteHostingPlanStep, SiteNameStep, SiteOSStep, SiteRuntimeStep, WebsiteOS } from 'vscode-azureappservice';
-import { AzExtTreeItem, AzureTreeItem, AzureWizard, AzureWizardExecuteStep, AzureWizardPromptStep, createAzureClient, IActionContext, ICreateChildImplContext, INewStorageAccountDefaults, LocationListStep, parseError, ResourceGroupCreateStep, ResourceGroupListStep, StorageAccountCreateStep, StorageAccountKind, StorageAccountListStep, StorageAccountPerformance, StorageAccountReplication, SubscriptionTreeItemBase } from 'vscode-azureextensionui';
+import { AzExtTreeItem, AzureTreeItem, AzureWizard, AzureWizardExecuteStep, AzureWizardPromptStep, createAzureClientV2, IActionContext, ICreateChildImplContext, INewStorageAccountDefaults, LocationListStep, parseError, ResourceGroupCreateStep, ResourceGroupListStep, StorageAccountCreateStep, StorageAccountKind, StorageAccountListStep, StorageAccountPerformance, StorageAccountReplication, SubscriptionTreeItemBase } from 'vscode-azureextensionui';
 import { extensionPrefix, ProjectLanguage, projectLanguageSetting, ProjectRuntime, projectRuntimeSetting } from '../constants';
 import { ext } from '../extensionVariables';
 import { tryGetLocalRuntimeVersion } from '../funcCoreTools/tryGetLocalRuntimeVersion';
@@ -23,7 +23,7 @@ export class SubscriptionTreeItem extends SubscriptionTreeItemBase {
     private _nextLink: string | undefined;
 
     public hasMoreChildrenImpl(): boolean {
-        return this._nextLink !== undefined;
+        return !!this._nextLink;
     }
 
     public async loadMoreChildrenImpl(clearCache: boolean): Promise<AzExtTreeItem[]> {
@@ -31,10 +31,10 @@ export class SubscriptionTreeItem extends SubscriptionTreeItemBase {
             this._nextLink = undefined;
         }
 
-        const client: WebSiteManagementClient = createAzureClient(this.root, WebSiteManagementClient);
+        const client: WebSiteManagementClient = createAzureClientV2(this.root, WebSiteManagementClient);
         let webAppCollection: WebSiteManagementModels.WebAppCollection;
         try {
-            webAppCollection = this._nextLink === undefined ?
+            webAppCollection = !this._nextLink ?
                 await client.webApps.list() :
                 await client.webApps.listNext(this._nextLink);
         } catch (error) {

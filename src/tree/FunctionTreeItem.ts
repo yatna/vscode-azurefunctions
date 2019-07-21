@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { WebSiteManagementModels } from 'azure-arm-website';
+import { WebSiteManagementModels } from '@azure/arm-appservice';
 import * as url from 'url';
 import { ProgressLocation, window } from 'vscode';
 import { functionsAdminRequest, ISiteTreeRoot } from 'vscode-azureappservice';

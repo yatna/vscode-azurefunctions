@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { WebSiteManagementModels } from 'azure-arm-website';
+import { WebSiteManagementModels } from '@azure/arm-appservice';
 import { isArray } from 'util';
 import { ISiteTreeRoot } from 'vscode-azureappservice';
 import { AzExtTreeItem, AzureParentTreeItem } from 'vscode-azureextensionui';
@@ -54,7 +54,7 @@ export class FunctionsTreeItem extends AzureParentTreeItem<ISiteTreeRoot> {
     }
 
     public hasMoreChildrenImpl(): boolean {
-        return this._nextLink !== undefined;
+        return !!this._nextLink;
     }
 
     public async loadMoreChildrenImpl(clearCache: boolean): Promise<AzExtTreeItem[]> {

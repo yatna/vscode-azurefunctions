@@ -3,9 +3,9 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { WebSiteManagementClient, WebSiteManagementModels } from 'azure-arm-website';
+import { WebSiteManagementClient, WebSiteManagementModels } from '@azure/arm-appservice';
 import { createSlot, ISiteTreeRoot, SiteClient } from 'vscode-azureappservice';
-import { AzExtTreeItem, AzureParentTreeItem, AzureTreeItem, createAzureClient, ICreateChildImplContext } from 'vscode-azureextensionui';
+import { AzExtTreeItem, AzureParentTreeItem, AzureTreeItem, createAzureClientV2, ICreateChildImplContext } from 'vscode-azureextensionui';
 import { localize } from '../localize';
 import { treeUtils } from '../utils/treeUtils';
 import { ProductionSlotTreeItem } from './ProductionSlotTreeItem';
@@ -34,7 +34,7 @@ export class SlotsTreeItem extends AzureParentTreeItem<ISiteTreeRoot> {
     }
 
     public hasMoreChildrenImpl(): boolean {
-        return this._nextLink !== undefined;
+        return !!this._nextLink;
     }
 
     public async loadMoreChildrenImpl(clearCache: boolean): Promise<AzExtTreeItem[]> {
@@ -42,8 +42,8 @@ export class SlotsTreeItem extends AzureParentTreeItem<ISiteTreeRoot> {
             this._nextLink = undefined;
         }
 
-        const client: WebSiteManagementClient = createAzureClient(this.root, WebSiteManagementClient);
-        const webAppCollection: WebSiteManagementModels.WebAppCollection = this._nextLink === undefined ?
+        const client: WebSiteManagementClient = createAzureClientV2(this.root, WebSiteManagementClient);
+        const webAppCollection: WebSiteManagementModels.WebAppCollection = !this._nextLink ?
             await client.webApps.listSlots(this.root.client.resourceGroup, this.root.client.siteName) :
             await client.webApps.listSlotsNext(this._nextLink);
 

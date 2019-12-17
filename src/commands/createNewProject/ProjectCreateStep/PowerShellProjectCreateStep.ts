@@ -40,7 +40,8 @@ const requirementspsd1: string = `# This file enables modules to be automaticall
 # See https://aka.ms/functionsmanageddependency for additional information.
 #
 @{
-    'Az' = '3.*'
+    # Uncomment the next line and replace the MAJOR_VERSION. For latest supported version, go to https://www.powershellgallery.com/packages/Az
+    # 'Az' = 'MAJOR_VERSION.*'
 }`;
 
 export class PowerShellProjectCreateStep extends ScriptProjectCreateStep {

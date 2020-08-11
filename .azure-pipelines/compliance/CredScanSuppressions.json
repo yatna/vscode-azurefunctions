@@ -2,7 +2,7 @@
     "tool": "Credential Scanner",
     "suppressions": [
         {
-            "folder": "node_modules",
+            "folder": "node_modules\\",
             "_justification": "No need to scan external node modules."
         }
     ]

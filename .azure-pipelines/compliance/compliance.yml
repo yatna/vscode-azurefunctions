@@ -11,6 +11,7 @@ steps:
   displayName: 'Run CredScan'
   inputs:
     toolMajorVersion: V2
+    suppressionsFile: '$(Build.SourcesDirectory)/.azure-pipelines/compliance/CredScanSuppressions.json'
     debugMode: false
   continueOnError: true
   condition: eq(variables['ENABLE_COMPLIANCE'], 'true')

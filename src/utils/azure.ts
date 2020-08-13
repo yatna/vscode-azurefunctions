@@ -3,13 +3,16 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { StorageManagementClient, StorageManagementModels } from 'azure-arm-storage';
+import { StorageManagementModels } from 'azure-arm-storage';
 import { BaseResource } from 'ms-rest-azure';
 import { isArray } from 'util';
 import { createAzureClient, IAzureQuickPickItem, IStorageAccountWizardContext } from 'vscode-azureextensionui';
 import { ext } from '../extensionVariables';
 import { localize } from '../localize';
+import { getEnvironment, ifStack } from './environmentUtils';
 import { nonNullProp, nonNullValue } from './nonNull';
+// tslint:disable-next-line: no-var-requires
+let StorageManagementClient = require('azure-arm-storage3');
 
 function parseResourceId(id: string): RegExpMatchArray {
     const matches: RegExpMatchArray | null = id.match(/\/subscriptions\/(.*)\/resourceGroups\/(.*)\/providers\/(.*)\/(.*)/);
@@ -60,7 +63,11 @@ export interface IResourceResult {
 }
 
 export async function getStorageConnectionString(context: IStorageAccountWizardContext): Promise<IResourceResult> {
-    const client: StorageManagementClient = createAzureClient(context, StorageManagementClient);
+    const isAzureStack: boolean = ifStack();
+    if (isAzureStack) {
+        await getEnvironment(context);
+    }
+    const client: typeof StorageManagementClient = createAzureClient(context, StorageManagementClient);
     const storageAccount: StorageManagementModels.StorageAccount = <StorageManagementModels.StorageAccount>nonNullProp(context, 'storageAccount');
     const name: string = nonNullProp(storageAccount, 'name');
 

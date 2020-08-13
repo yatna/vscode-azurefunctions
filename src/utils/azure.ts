@@ -4,10 +4,12 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { StorageManagementClient, StorageManagementModels } from '@azure/arm-storage';
+import { StorageManagementClient as StorageManagementClient1 } from '@azure/arm-storage1';
 import { isArray } from 'util';
 import { createAzureClient, IAzureQuickPickItem, IStorageAccountWizardContext } from 'vscode-azureextensionui';
 import { ext } from '../extensionVariables';
 import { localize } from '../localize';
+import { getEnvironment, ifStack } from './environmentUtils';
 import { nonNullProp, nonNullValue } from './nonNull';
 
 function parseResourceId(id: string): RegExpMatchArray {
@@ -59,7 +61,14 @@ export interface IResourceResult {
 }
 
 export async function getStorageConnectionString(context: IStorageAccountWizardContext): Promise<IResourceResult> {
-    const client: StorageManagementClient = createAzureClient(context, StorageManagementClient);
+    let isAzureStack: boolean = ifStack();
+    let client: StorageManagementClient;
+    if (isAzureStack) {
+        await getEnvironment(context);
+        client = createAzureClient(context, StorageManagementClient1);
+    } else {
+        client = createAzureClient(context, StorageManagementClient);
+    }
     const storageAccount: StorageManagementModels.StorageAccount = nonNullProp(context, 'storageAccount');
     const name: string = nonNullProp(storageAccount, 'name');
 
